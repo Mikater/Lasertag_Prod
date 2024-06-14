@@ -10,7 +10,27 @@
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+// Pinout
+int16_t button1 = 4;
+int16_t IR_Diode = 2;
+int16_t diods = 5;
+
+// IR
+const int16_t lvl_0           = 600;
+const int16_t lvl_1           = lvl_0<<1;
+const uint8_t irfrequency     = 36;
+const int16_t irt             = (int) ((500/irfrequency) - 4);
+const uint8_t irpulses       = (int) (lvl_0 / (1000/irfrequency));
+
+int HP = 100;
+int Ammo = 30;
+
 void setup() {
+  pinMode(button1, INPUT_PULLUP); // Налаштуйте штифт як вхідний
+  pinMode(diods, OUTPUT);
+  pinMode(IR_Diode, OUTPUT);
+  Serial.begin(115200);
+  Serial.println("start");
   // put your setup code here, to run once:
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
@@ -19,8 +39,59 @@ void setup() {
 }
 
 void loop() {
+  triggers();
   i2cDisp();
-  delay(2000);
+  delay(200);
+}
+
+void triggers(){
+    static uint8_t tr  = 0;
+    static uint8_t ltr = 0;
+    ltr = tr;
+    tr = digitalRead(button1);
+    if ( tr != ltr && tr == LOW){
+      Serial.print("ButShot");
+      digitalWrite(diods, HIGH);
+      sendcommand(0x8305);
+            //sendclonedata();
+            //sendcommand(commands[x_to_mass]);
+      delay(1000);
+      digitalWrite(diods, LOW);
+}}
+
+void sendcommand(uint16_t comm){
+    uint8_t parity = 0;
+    sendPulse(IR_Diode,2);
+    delayMicroseconds(lvl_0);
+    for (int16_t i = 15; i >= 0; i--){
+        if (((comm >> i) & B1) == 0){sendPulse(IR_Diode,0);}
+        else {
+            sendPulse(IR_Diode,1);
+            parity = parity + 1;
+        }
+        delayMicroseconds(lvl_0);        
+    }
+    for (int16_t i = 7; i >= 0; i--){
+        if (((0xE8 >> i) & B1) == 0){sendPulse(IR_Diode,0);}
+        else {sendPulse(IR_Diode,1);}
+        delayMicroseconds(lvl_0);        
+    }
+    parity += 4;
+    //if (cl_game_mode_on == 0){parity = 24 - parity;}
+    if (parity%2 == 0){sendPulse(IR_Diode,0);}
+    else {sendPulse(IR_Diode,1);}
+    delayMicroseconds(lvl_0); 
+}
+
+void sendPulse(int16_t pin, uint8_t length){
+  int16_t i = 0;
+    while(i < irpulses<<length){
+      i++;
+      digitalWrite(pin, HIGH);
+      delayMicroseconds(irt);
+      digitalWrite(pin, LOW);
+      delayMicroseconds(irt);
+    }
 }
 
 void i2cDisp() {
