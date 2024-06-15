@@ -36,11 +36,12 @@ void setup() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
+  i2cDisp();
 }
 
 void loop() {
   triggers();
-  i2cDisp();
+  // i2cDisp();
   delay(200);
 }
 
@@ -50,9 +51,9 @@ void triggers(){
     ltr = tr;
     tr = digitalRead(button1);
     if ( tr != ltr && tr == LOW){
-      Serial.print("ButShot");
+      // Serial.print("ButShot");
       digitalWrite(diods, HIGH);
-      sendcommand(0x8305);
+      sendcommand(0x8302);
             //sendclonedata();
             //sendcommand(commands[x_to_mass]);
       delay(1000);
@@ -60,38 +61,23 @@ void triggers(){
 }}
 
 void sendcommand(uint16_t comm){
-    uint8_t parity = 0;
-    sendPulse(IR_Diode,2);
-    delayMicroseconds(lvl_0);
-    for (int16_t i = 15; i >= 0; i--){
-        if (((comm >> i) & B1) == 0){sendPulse(IR_Diode,0);}
-        else {
-            sendPulse(IR_Diode,1);
-            parity = parity + 1;
-        }
-        delayMicroseconds(lvl_0);        
+    sendPulse(IR_Diode, 3); // start
+    for(int i = 15; i>=0; i--){
+      sendPulse(IR_Diode, bitRead(comm, i) == 0 ? 0 : 1);
     }
-    for (int16_t i = 7; i >= 0; i--){
-        if (((0xE8 >> i) & B1) == 0){sendPulse(IR_Diode,0);}
-        else {sendPulse(IR_Diode,1);}
-        delayMicroseconds(lvl_0);        
+    for(int i = 7; i>=0; i--){
+      //sendPulse(IR_Diode,(((byte*)&comm)[i])==0 ? 0 : 1);
+      //binaryString += bitRead(0xE8, i) == 0 ? "0" : "1";
+      sendPulse(IR_Diode, bitRead(0xE8, i) == 0 ? 0 : 1);
     }
-    parity += 4;
-    //if (cl_game_mode_on == 0){parity = 24 - parity;}
-    if (parity%2 == 0){sendPulse(IR_Diode,0);}
-    else {sendPulse(IR_Diode,1);}
-    delayMicroseconds(lvl_0); 
 }
 
-void sendPulse(int16_t pin, uint8_t length){
-  int16_t i = 0;
-    while(i < irpulses<<length){
-      i++;
-      digitalWrite(pin, HIGH);
-      delayMicroseconds(irt);
-      digitalWrite(pin, LOW);
-      delayMicroseconds(irt);
-    }
+void sendPulse(int16_t pin, int length){
+  int sig_l = 580; // крок сигналу
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(sig_l+(sig_l*length));
+  digitalWrite(pin, LOW);
+  delayMicroseconds(sig_l);
 }
 
 void i2cDisp() {
