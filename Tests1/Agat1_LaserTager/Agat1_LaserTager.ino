@@ -15,14 +15,25 @@ int16_t button1 = 4;
 int16_t IR_Diode = 2;
 int16_t diods = 5;
 
+// IR Properties
 const int16_t lvl_0           = 600;
 const uint8_t irfrequency    = 36;
 const int16_t irt            = (int) (1000/irfrequency);
 const uint8_t irpulses       = (int) (lvl_0 / (2000/irfrequency));
 
+// Player Details
+int team = 0; // 0 - red | 1 - blue | 2 - yellow | 3 - green
+int ID = 20;  // айді тагера
+int damage = 9;
+
+// Game Proporties
+int[16] M_Damage = [1, 2, 4, 5, 7, 10, 15, 17, 20, 25, 30, 35, 40, 50, 75, 100];
 int HP = 100;
 int Ammo = 30;
+int M_Ammo = 9;
 int shootMode = 0;
+int gameMode = 0; // 0 - WaitMod | 1 - InGame | 2 - Game Over
+int shootData = 0;
 
 void setup() {
   pinMode(button1, INPUT_PULLUP); // Налаштуйте штифт як вхідний
@@ -49,30 +60,35 @@ void triggers(){
     ltr = tr;
     tr = digitalRead(button1);
     if ( tr != ltr && tr == LOW){
-      sendcommand(0x8305);
-      // Serial.print("ButShot");
+      if(gameMode = 1){}
+      shoot();
       digitalWrite(diods, HIGH);
-      if(shootMode <= 1){
-        shootMode++;
-      } else{ shootMode = 0;}
-
-            //sendcommand(commands[x_to_mass]);
-      delay(1000);
+      delay(100);
       digitalWrite(diods, LOW);
 }}
 
+void createShootData(){
+  shootData = 0;
+  shootData = ID << 16;
+  shootData = shootData | (team << 14);
+  shootData = shootData | (damage << 10);
+}
+
+void shoot(){
+  sendPulse(IR_Diode, 2);
+  for(int i = 23; i>=0; i--){
+    sendPulse(IR_Diode, bitRead(shootData, i) == 0 ? 0 : 1);
+  }
+}
+
 void sendcommand(uint16_t comm){
-    sendPulse(IR_Diode, 2); // start
-    delayMicroseconds(lvl_0);
-    for(int i = 15; i>=0; i--){
-      sendPulse(IR_Diode, bitRead(comm, i) == 0 ? 0 : 1);
-      delayMicroseconds(lvl_0);
-    }
-    for(int i = 7; i>=0; i--){
-      //binaryString += bitRead(0xE8, i) == 0 ? "0" : "1";
-      sendPulse(IR_Diode, bitRead(0xE8, i) == 0 ? 0 : 1);
-      delayMicroseconds(lvl_0);
-    }
+  sendPulse(IR_Diode, 2); // start
+  for(int i = 15; i>=0; i--){
+    sendPulse(IR_Diode, bitRead(comm, i) == 0 ? 0 : 1);
+  }
+  for(int i = 7; i>=0; i--){
+    sendPulse(IR_Diode, bitRead(0xE8, i) == 0 ? 0 : 1);
+  }
 }
 
 void sendPulse(int16_t pin, int length){
@@ -84,21 +100,20 @@ void sendPulse(int16_t pin, int length){
     digitalWrite(pin, LOW);
     delayMicroseconds(irt);
   }
-  // digitalWrite(pin, HIGH);
-  // delayMicroseconds(lvl_0 << length);
-  // digitalWrite(pin, LOW);
-  // delayMicroseconds(lvl_0);
+  delayMicroseconds(lvl_0);
 }
 
 void i2cDisp() {
-  int game_mode = 1;
+  int gameMode = 1;
   int life = 100;
   display.clearDisplay();
   dispTopLine();
-  if (game_mode == 1){
+  if (gameMode != 0){
     if( life > 0 ){ 
     DisplayInGame();}
     else {DisplayGameOver();}
+  } else {
+    DisplayWaitMenu();
   }
   display.display();
 }
@@ -148,6 +163,10 @@ void dispTopLine() {
   } else if(battHead > -1){
     display.drawBitmap(battHeadX, battHeadY, Battery10, 13, 7, 1);
   }
+}
+
+void DisplayWaitMenu(){
+
 }
 
 void DisplayInGame(){
