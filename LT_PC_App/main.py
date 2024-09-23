@@ -6,7 +6,7 @@ ctk.set_default_color_theme("blue")
 
 root = ctk.CTk()
 
-root.title("MyApp")
+root.title("LaserTak PC App")
 root.geometry(config.WINDOW_SIZE)
 
 
@@ -30,7 +30,7 @@ my1button = ctk.CTkButton(root, text="Hi Bot",
 my1button.pack(pady=80)
 my1label = ctk.CTkLabel(root, text="Hello world!", font=config.FONT1)
 my1label.pack(pady=20)
-my2label = ctk.CTkLabel(root, text="")
+my2label = ctk.CTkLabel(root, text="Text2")
 my2label.pack(pady=20)
 
 my1entry = ctk.CTkEntry(root, placeholder_text='Пиши сюда!',
