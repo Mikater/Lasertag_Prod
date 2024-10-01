@@ -2,37 +2,47 @@ from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivymd.uix.screen import MDScreen
+from kivy.uix.screenmanager import ScreenManager
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
 
 Window.size = (460, 900)
-
-Screen_STR = """
-MDScreen:
-    name: "Screen1"
-    MDBoxLayout:
-        orientation: 'vertical'
-        MDScrollView:
-            do_scroll_x: False
-            MDStackLayout:
-                adaptive_height: False
-                BaseCard:
-                    size_hint_y: "200dp"
-                    
-                
-"""
+id_next_base = 0
 
 
 class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
-    pass
+    def change_team(self, color):
+        if self.circle.md_bg_color == color:
+            self.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
+        else:
+            self.circle.md_bg_color = color
 
 
 class LTApp(MDApp):
+
     def build(self):
+        global screen_manager
+        screen_manager = ScreenManager()
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Teal"  # "Purple", "Red"
-        screen = Builder.load_file("BaseScreen.kv")
-        return screen
+        screen_manager.add_widget(Builder.load_file("BaseScreen.kv"))
+        return screen_manager
+
+    def on_start(self):
+        for i in range(4):
+            self.add1base()
+
+    def add1base(self):
+        card = BaseCard()
+        global id_next_base
+        id = id_next_base
+        card.name_base.text = f"Base {id}"
+        id_next_base += 1
+        card.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
+        screen_manager.get_screen("Screen1").obj_bar.add_widget(card)
+
+
+
 
 
 LTApp().run()
