@@ -1,13 +1,18 @@
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang import Builder
-from kivymd.uix.screen import MDScreen
 from kivy.uix.screenmanager import ScreenManager
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
 
-Window.size = (460, 900)
+Window.size = (460, 600)
 id_next_base = 0
+
+
+class BotLine(MDFloatLayout):
+
+    def change_screen(self, sc):
+        screen_manager.current = sc
 
 
 class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
@@ -18,14 +23,16 @@ class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
             self.circle.md_bg_color = color
 
 
-class LTApp(MDApp):
 
+class LTApp(MDApp):
+    global screen_manager
+    screen_manager = ScreenManager()
     def build(self):
-        global screen_manager
-        screen_manager = ScreenManager()
+
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Teal"  # "Purple", "Red"
         screen_manager.add_widget(Builder.load_file("BaseScreen.kv"))
+        screen_manager.add_widget(Builder.load_file("PlayersScreen.kv"))
         return screen_manager
 
     def on_start(self):
@@ -40,6 +47,9 @@ class LTApp(MDApp):
         id_next_base += 1
         card.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
         screen_manager.get_screen("Screen1").obj_bar.add_widget(card)
+
+    def change_screen(self, sc):
+        screen_manager.current = sc
 
 
 

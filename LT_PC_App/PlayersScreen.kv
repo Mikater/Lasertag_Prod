@@ -1,0 +1,29 @@
+<BotLine>
+    md_bg_color: 102/255, 1, 178/255, 1
+    size_hint: 1, None
+    height: "80dp"
+
+    MDIconButton:
+        pos_hint: {"center_x": .2, "center_y": .5}
+        id: icon
+        icon: "chess-rook"
+        font_size: "50sp"
+        on_press: root.change_screen("Screen1")
+
+    MDIconButton:
+        pos_hint: {"center_x": .8, "center_y": .5}
+        id: icon
+        icon: "account-tie"
+        font_size: "50sp"
+        on_press: root.change_screen("Screen2")
+
+
+MDScreen:
+    name: "Screen2"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+        BotLine:
+
+
+
