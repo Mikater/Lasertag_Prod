@@ -86,8 +86,8 @@ void setup() {
 }
 
 void loop() {
-  //buttons_checker();
-  buttonTriggers();
+  buttons_checker();
+  // buttonTriggers();
   take_command();
 }
 
