@@ -23,6 +23,18 @@ class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
             self.circle.md_bg_color = color
 
 
+class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
+    Live = True
+
+    def kill_res_player(self):
+        if self.Live:
+            self.bg.md_bg_color = (200/255, 200/255, 200/255, 1)
+            self.Live = False
+        else:
+            self.bg.md_bg_color = (255 / 255, 0 / 255, 200 / 255, 1)
+            self.Live = True
+
+
 
 class LTApp(MDApp):
     global screen_manager
@@ -36,7 +48,7 @@ class LTApp(MDApp):
         return screen_manager
 
     def on_start(self):
-        for i in range(4):
+        for i in range(1):
             self.add1base()
 
     def add1base(self):
