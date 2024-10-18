@@ -1,0 +1,192 @@
+<BotLine>
+    md_bg_color: 102/255, 1, 178/255, 1
+    size_hint: 1, None
+    height: "80dp"
+
+    MDIconButton:
+        pos_hint: {"center_x": .2, "center_y": .5}
+        id: icon
+        icon: "chess-rook"
+        on_press: root.change_screen("Screen1")
+
+    MDIconButton:
+        pos_hint: {"center_x": .8, "center_y": .5}
+        id: icon
+        icon: "account-tie"
+        on_press: root.change_screen("Screen2")
+
+
+
+
+<BaseCard>
+    name_base: name_base
+    icon: icon
+    circle: circle
+    id: 0
+    elevation: 1
+    size_hint: 0.9, None
+    height: "200dp"
+    md_bg_color: 1, 1, 1, 1
+    radius: [8]
+    MDFloatLayout:
+        id: bar
+        size_hint: .9, .01
+        pos_hint: {"center_x": .5, "center_y": .04}
+        md_bg_color: 0/255, 213/255, 255/255, 1
+
+    MDFloatLayout:
+        id: circle
+        size_hint: None, None
+        height: "140dp"
+        width: "140dp"
+        radius: [70]
+        pos_hint: {"center_x": .2, "center_y": .5}
+        md_bg_color: 200/255, 200/255, 200/255, 1
+    MDFloatLayout:
+        size_hint: None, None
+        height: "130dp"
+        width: "130dp"
+        radius: [65]
+        pos_hint: {"center_x": .2, "center_y": .5}
+        md_bg_color: 1, 1, 1, 1
+    MDIcon:
+        id: icon
+        icon: "chess-rook"
+        pos_hint: {"center_x": .2, "center_y": .5}
+        font_size: "120sp"
+
+
+    MDLabel:
+        id: name_base
+        text: "name"
+        font_size: "20sp"
+        size_hint_x: .8
+        pos_hint: {"center_x": .8, "center_y": .75}
+
+    MDBoxLayout:
+        size_hint: None, None
+        width: '80dp'
+        height: '80dp'
+        pos_hint: {"center_x": 0.85, "center_y": 0.75}
+        MDAnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'center'
+            MDLabel:
+                id: HP
+                text: "100"
+                font_size: "20sp"
+        MDAnchorLayout:
+            anchor_x: 'left'
+            anchor_y: 'center'
+            MDIcon:
+                icon: "heart"
+
+    MDGridLayout:
+        spacing: [10]
+        cols: 3
+        rows: 3
+        radius: [8]
+        md_bg_color: .3, .3, .3, 0.2
+        size_hint: .3, .4
+        pos_hint: {"center_x": 0.55, "center_y": 0.3}
+        MDAnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDIcon:
+                icon: "home-lightning-bolt-outline"
+        MDAnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDIcon:
+                icon: "restart"
+        MDAnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            MDIcon:
+                icon: "shield-check-outline"
+        CB:
+        CB:
+        CB:
+
+    MDFloatLayout:
+        radius: [8]
+        md_bg_color: .3, .3, .3, 0.2
+        size_hint: None, None
+        width: '80dp'
+        height: '80dp'
+        pos_hint: {"center_x": 0.85, "center_y": 0.3}
+        MDIconButton:
+            id: butt_green
+            pos_hint: {"center_x": .25, "center_y": .75}
+            size_hint: None, None
+            size: dp(20), dp(20)
+            theme_icon_color: "Custom"
+            icon_color: 36/255, 134/255, 220/255, 1
+            icon: "record"
+            style: "standard"
+            on_press: root.change_team(self.icon_color)
+        MDIconButton:
+            pos_hint: {"center_x": .25, "center_y": .25}
+            size_hint: None, None
+            size: dp(20), dp(20)
+            theme_icon_color: "Custom"
+            icon_color: 247/255, 247/255, 7/255, 1
+            icon: "record"
+            style: "standard"
+            on_press: root.change_team(self.icon_color)
+        MDIconButton:
+            pos_hint: {"center_x": .75, "center_y": .75}
+            size_hint: None, None
+            size: dp(20), dp(20)
+            theme_icon_color: "Custom"
+            icon_color: 226/255, 30/255, 30/255, 1
+            icon: "record"
+            style: "standard"
+            on_press: root.change_team(self.icon_color)
+        MDIconButton:
+            pos_hint: {"center_x": .75, "center_y": .25}
+            size_hint: None, None
+            size: "20dp", "20dp"
+            theme_icon_color: "Custom"
+            icon_color: 30/255, 226/255, 30/255, 1
+            icon: "record"
+            style: "standard"
+            on_press: root.change_team(self.icon_color)
+
+
+MDScreen:
+    obj_bar: obj_bar
+    name: "Screen1"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            bar_width: 0
+            MDGridLayout:
+                id: obj_bar
+                padding: [10]
+                spacing: [10]
+                cols: 1
+                height: self.minimum_height
+                row_default_height: 200
+                size_hint_y: None
+        BotLine:
+
+
+<PlayerScreen>:
+    name: "Screen2"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+        BotLine:
+
+<CB@MDAnchorLayout>
+    anchor_x: 'center'
+    anchor_y: 'center'
+    Check:
+
+<Check@MDCheckbox>
+    group: 'group'
+    size_hint: None, None
+    size: dp(48), dp(48)
