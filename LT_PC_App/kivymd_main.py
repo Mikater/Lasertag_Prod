@@ -5,6 +5,8 @@ from kivy.uix.screenmanager import ScreenManager
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
 
+import web_controll
+
 Window.size = (460, 600)
 id_next_base = 0
 
@@ -21,6 +23,7 @@ class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
             self.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
         else:
             self.circle.md_bg_color = color
+            web_controll.find()
 
 
 class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
