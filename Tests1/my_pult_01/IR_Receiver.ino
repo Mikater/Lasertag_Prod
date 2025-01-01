@@ -45,7 +45,6 @@ void take_command(){
     i2cCommand(data);
     if(digitalRead(Button4) == LOW){
       mainCommandB2 = data;
-      tone(buzzer, 1000, 200);
     } 
   }
 }

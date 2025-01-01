@@ -2,7 +2,6 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Adafruit_NeoPixel.h> // Світлодіодна лента
 
 // I2C Display 
 #define SCREEN_WIDTH  128 // OLED display width, in pixels
@@ -13,7 +12,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // pinout
 int16_t irDiode = 0;
-int16_t buzzer = 1;
+int16_t vibro = 1;
 int16_t rgbLine = 2;
 int16_t irReceiver = 3;
 // int16_t battery = 4;
@@ -53,13 +52,11 @@ int numEl2 = 5;
 int mainCommandB2 = 0;
 int standartMainCommandB2 = 0x8305E8;
 
-// Led Strip
-#define NUM_LEDS    3       // Кількість світлодіодів у стрічці
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, rgbLine, NEO_GRB + NEO_KHZ800);
+
 
 void setup() {
   pinMode(irDiode, OUTPUT);
-  pinMode(buzzer, OUTPUT);
+  pinMode(vibro, OUTPUT);
   pinMode(irReceiver, INPUT);
 
   pinMode(Button1, INPUT_PULLUP);
@@ -68,9 +65,7 @@ void setup() {
   pinMode(Button4, INPUT_PULLUP);
   pinMode(Button5, INPUT_PULLUP);
   pinMode(Button6, INPUT_PULLUP);
-  strip.begin();           // Ініціалізація стрічки
-  strip.show(); 
-  strip.setBrightness(50); // Встановлення яскравості
+  
   Serial.begin(115200);
   Serial.println("start");
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -82,7 +77,9 @@ void setup() {
 
   mainCommandB2 = standartMainCommandB2;
 
-  tone(buzzer, 800, 500);
+  digitalWrite(vibro, HIGH);
+  delay(300);
+  digitalWrite(vibro, LOW);
 }
 
 void loop() {
@@ -91,11 +88,6 @@ void loop() {
   take_command();
 }
 
-void setColorString(int Red, int Green, int Blue){
-  for(int i; i < NUM_LEDS; i++){
-          strip.setPixelColor(i, strip.Color(Red, Green, Blue));}
-  strip.show();
-}
 
 
 

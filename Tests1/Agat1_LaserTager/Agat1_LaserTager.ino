@@ -2,6 +2,22 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <Adafruit_NeoPixel.h>
+#include <WiFi.h>
+#include <WebServer.h>
+#include <esp_now.h>
+#include "GyverButton.h"
+
+
+#define BTN_PIN 14				// кнопка подключена сюда (BTN_PIN --- КНОПКА --- GND)
+GButton butt1(BTN_PIN);
+
+// WiFi
+const char* ssid = "netis";
+const char* password = "Cntgfy40";
+WebServer server(80);
+bool server_on = false;
+
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32
@@ -11,9 +27,16 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Pinout
-int16_t button1 = 4;
-int16_t IR_Diode = 2;
-int16_t diods = 5;
+int16_t button1 = 14;
+int16_t button2 = 23;
+int16_t IR_Diode = 4;
+int16_t IR_Diode_Force = 19;
+int16_t Leds = 5;
+int16_t Buzzer = 2;
+
+// LED
+int NumPixels = 4;
+Adafruit_NeoPixel pixels(NumPixels, Leds, NEO_GRB + NEO_KHZ800);
 
 // IR Properties
 const int16_t lvl_0           = 600;
@@ -23,177 +46,56 @@ const uint8_t irpulses       = (int) (lvl_0 / (2000/irfrequency));
 
 // Player Details
 int team = 0; // 0 - red | 1 - blue | 2 - yellow | 3 - green
-int ID = 20;  // айді тагера
 int damage = 9;
+// Device data
+int SerialNomber = 0;
+int ID = 20;  // айді тагера
 
 // Game Proporties
-int[16] M_Damage = [1, 2, 4, 5, 7, 10, 15, 17, 20, 25, 30, 35, 40, 50, 75, 100];
+int M_Damage[16] = {1, 2, 4, 5, 7, 10, 15, 17, 20, 25, 30, 35, 40, 50, 75, 100};
 int HP = 100;
+int mode = 1;
 int Ammo = 30;
 int M_Ammo = 9;
 int shootMode = 0;
-int gameMode = 0; // 0 - WaitMod | 1 - InGame | 2 - Game Over
+int gameMode = 1; // 0 - WaitMod | 1 - InGame | 2 - Game Over
 int shootData = 0;
 
 void setup() {
-  pinMode(button1, INPUT_PULLUP); // Налаштуйте штифт як вхідний
-  pinMode(diods, OUTPUT);
+  Serial.begin(115200);
+  //pinMode(button1, INPUT_PULLUP);
+  pinMode(Buzzer, OUTPUT);
+  pinMode(button2, INPUT_PULLUP);
   pinMode(IR_Diode, OUTPUT);
+  pinMode(IR_Diode_Force, OUTPUT);
   Serial.begin(115200);
   Serial.println("start");
+  tone(Buzzer, 500, 500);
   // put your setup code here, to run once:
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
+  WiFi_start(); // Web server
+
+  pixels.begin(); // LED
+  pixels.setBrightness(100);
+  pixels.clear();
 }
 
 void loop() {
-  triggers();
+  butt1.tick();
+  if (butt1.isPress()) Serial.println("Press"); 
   i2cDisp();
   delay(200);
-}
-
-void triggers(){
-    static uint8_t tr  = 0;
-    static uint8_t ltr = 0;
-    ltr = tr;
-    tr = digitalRead(button1);
-    if ( tr != ltr && tr == LOW){
-      if(gameMode = 1){}
-      shoot();
-      digitalWrite(diods, HIGH);
-      delay(100);
-      digitalWrite(diods, LOW);
-}}
-
-void createShootData(){
-  shootData = 0;
-  shootData = ID << 16;
-  shootData = shootData | (team << 14);
-  shootData = shootData | (damage << 10);
-}
-
-void shoot(){
-  sendPulse(IR_Diode, 2);
-  for(int i = 23; i>=0; i--){
-    sendPulse(IR_Diode, bitRead(shootData, i) == 0 ? 0 : 1);
+  if (WiFi.status() != WL_CONNECTED && !server_on){
+    server_start();
   }
-}
-
-void sendcommand(uint16_t comm){
-  sendPulse(IR_Diode, 2); // start
-  for(int i = 15; i>=0; i--){
-    sendPulse(IR_Diode, bitRead(comm, i) == 0 ? 0 : 1);
-  }
-  for(int i = 7; i>=0; i--){
-    sendPulse(IR_Diode, bitRead(0xE8, i) == 0 ? 0 : 1);
-  }
-}
-
-void sendPulse(int16_t pin, int length){
-  int16_t i = 0;
-  while(i < irpulses<<length){
-    i++;
-    digitalWrite(pin, HIGH);
-    delayMicroseconds(irt);
-    digitalWrite(pin, LOW);
-    delayMicroseconds(irt);
-  }
-  delayMicroseconds(lvl_0);
-}
-
-void i2cDisp() {
-  int gameMode = 1;
-  int life = 100;
-  display.clearDisplay();
-  dispTopLine();
-  if (gameMode != 0){
-    if( life > 0 ){ 
-    DisplayInGame();}
-    else {DisplayGameOver();}
-  } else {
-    DisplayWaitMenu();
-  }
-  display.display();
-}
-
-void dispTopLine() {
-  const unsigned char icoNet [] PROGMEM = {
-	0x03, 0xf0, 0x0f, 0xf8, 0x1e, 0x00, 0x38, 0x00, 0x70, 0x00, 0x60, 0xf0, 0xe1, 0xf8, 0xc3, 0x80, 
-	0xc7, 0x00, 0xc6, 0x30, 0xc6, 0x78, 0xc6, 0x78, 0x42, 0x30};
-  const unsigned char Battery10 [] PROGMEM = {
-	0x7f, 0xf8, 0x40, 0x08, 0xc0, 0x08, 0x80, 0x08, 0xc0, 0x08, 0x40, 0x08, 0x7f, 0xf8};
-  const unsigned char Battery50 [] PROGMEM = {
-	0x7f, 0xf8, 0x42, 0xf8, 0xc1, 0xf8, 0x82, 0xf8, 0xc1, 0xf8, 0x42, 0xf8, 0x7f, 0xf8};
-  const unsigned char Battery100 [] PROGMEM = {
-	0x7f, 0xf8, 0x7f, 0xf8, 0xff, 0xf8, 0xff, 0xf8, 0xff, 0xf8, 0x7f, 0xf8, 0x7f, 0xf8};
-  const unsigned char line [] PROGMEM = {
-    0xc0, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x80, 
-	0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x80, 0x80};
-  //const unsigned char 
-  int netX = 0;
-  int netY = 19;
-  int battTagX = 0;
-  int battTagY = 0;
-  int battHeadX = 0;
-  int battHeadY = 10;
-
-  bool net = true;
-  int battTag = 50;
-  int battHead = 100;
-
-  display.drawBitmap(16, 1, line, 1, 30, 1);
-
-  if(net){
-    display.drawBitmap(netX, netY, icoNet, 13, 13, 1);
-  }
-
-  if(battTag > 70){
-    display.drawBitmap(battTagX, battTagY, Battery100, 13, 7, 1);
-  } else if(battTag > 10){
-    display.drawBitmap(battTagX, battTagY, Battery50, 13, 7, 1);
-  } else {
-    display.drawBitmap(battTagX, battTagY, Battery10, 13, 7, 1);
-  }
-  if(battHead > 70){
-    display.drawBitmap(battHeadX, battHeadY, Battery100, 13, 7, 1);
-  } else if(battHead > 10){
-    display.drawBitmap(battHeadX, battHeadY, Battery50, 13, 7, 1);
-  } else if(battHead > -1){
-    display.drawBitmap(battHeadX, battHeadY, Battery10, 13, 7, 1);
-  }
-}
-
-void DisplayWaitMenu(){
-
-}
-
-void DisplayInGame(){
-  // 'Hearth', 19x22px
-  const unsigned char icoHearth [] PROGMEM = {0x1f, 0x80, 0x00, 0x3f, 0xc0, 0x00, 0x7f, 0xe0, 0x00, 0xf8, 0xf0, 0x00, 0xf0, 0x78, 0x00, 0xf0, 
-	0x3c, 0x00, 0xf0, 0x1e, 0x00, 0xf8, 0x0f, 0x00, 0x7c, 0x07, 0x80, 0x3f, 0xff, 0xc0, 0x1f, 0xff, 
-	0xe0, 0x1f, 0xff, 0xe0, 0x3f, 0xff, 0xc0, 0x7c, 0x07, 0x80, 0xf8, 0x0f, 0x00, 0xf0, 0x1e, 0x00, 
-	0xf0, 0x3c, 0x00, 0xf0, 0x78, 0x00, 0xf8, 0xf0, 0x00, 0x7f, 0xe0, 0x00, 0x3f, 0xc0, 0x00, 0x1f, 
-	0x80, 0x00};
-  // 'Patt', 19x21px
-  const unsigned char icoAmmo3 [] PROGMEM = {0x37, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0xf7, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0x37, 0xff, 0xe0, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x37, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0xf7, 0xff, 
-	0xe0, 0x7f, 0xff, 0xe0, 0x37, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-	0x37, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0xf7, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0x37, 0xff, 0xe0};
-  const unsigned char icoAmmo1 [] PROGMEM = {0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x05, 0x80, 0x00, 0x00, 0x80, 0x01, 0x51, 0x80, 0x04, 
-	0x8f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x37, 0xff, 0xe0, 0x7f, 0xff, 0xe0, 0xf7, 0xff, 
-	0xe0, 0x7f, 0xff, 0xe0, 0x37, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x8f, 0x00, 
-	0x01, 0x51, 0x80, 0x00, 0x00, 0x80, 0x00, 0x05, 0x80, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00};
-  const unsigned char icoAmmoN [] PROGMEM = {0x37, 0xe7, 0x80, 0x7f, 0xcc, 0xc0, 0xf7, 0xd8, 0x60, 0x7f, 0xd3, 0x20, 0x37, 0xd3, 0x20, 0x00, 
-	0x18, 0x60, 0x00, 0x08, 0x60, 0x00, 0x0c, 0xc0, 0x37, 0xe5, 0x80, 0x7f, 0xf7, 0xa0, 0xf7, 0xf3, 
-	0x20, 0x7f, 0xf7, 0xa0, 0x37, 0xe6, 0x80, 0x00, 0x0c, 0xc0, 0x00, 0x18, 0x40, 0x00, 0x18, 0x60, 
-	0x37, 0xd3, 0x20, 0x7f, 0xd3, 0x20, 0xf7, 0xd8, 0x60, 0x7f, 0xcc, 0xc0, 0x37, 0xe7, 0x80};
-  const unsigned char* epd_bitmap_allArray[3] = {icoAmmoN, icoAmmo1, icoAmmo3};
-
-  display.drawBitmap(20, 5, icoHearth, 19, 22, 1);
-}
-
-void DisplayGameOver(){
+  server.handleClient();
+  // if(digitalRead(button2) == LOW){
+  //    dacWrite(25, 128);
+  // } else {dacWrite(25, 255);}
   
 }
+
+

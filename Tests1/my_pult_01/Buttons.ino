@@ -2,10 +2,8 @@ void buttons_checker(){
   if (digitalRead(Button2) == LOW){
     if (mode == 0){
       sendcommand(mainCommandB2);
-      setColorString(0, 255, 0);
       i2cBigText("Start!");
-      while(digitalRead(Button2) == LOW){}
-      setColorString(0, 0, 0);    
+      while(digitalRead(Button2) == LOW){}   
       i2cDisp();
     }
   }
@@ -13,10 +11,8 @@ void buttons_checker(){
   if (digitalRead(Button1) == LOW){
     if (mode == 0){
       // send command stop game;
-      setColorString(255, 0, 0);
       i2cBigText("STOP!");
       while(digitalRead(Button1) == LOW){}
-      setColorString(0, 0, 0);
       i2cDisp();
     } else {
       // exit to home
@@ -32,10 +28,8 @@ void buttons_checker(){
   if (digitalRead(Button3) == LOW){
     if(mode == 0){
       sendcommand(0x8B00E8);
-      setColorString(0, 255, 0);
       i2cBigText("HealBox");
-      while(digitalRead(Button3) == LOW){}
-      setColorString(0, 0, 0);    
+      while(digitalRead(Button3) == LOW){}  
       i2cDisp();
     }else if(mode == 1){
       i2cMenu2();
@@ -60,10 +54,8 @@ void buttons_checker(){
   if (digitalRead(Button5) == LOW){
     if(mode == 0){
       sendcommand(0x830EE8);
-      setColorString(255, 255, 255);
       i2cBigText("HealBox");
-      while(digitalRead(Button5) == LOW){}
-      setColorString(0, 0, 0);    
+      while(digitalRead(Button5) == LOW){}    
       i2cDisp();
     }else if(mode == 1){
       mode = 0;

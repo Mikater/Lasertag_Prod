@@ -120,11 +120,8 @@ void i2cCommand(int data){
       } else {Serial.println("Team Red");}
     }
   }
-  display.display();
-  setColorString(255, 0, 255);    
+  display.display();  
 
   Serial.println("= = = = = = = = = = = = = = = = = = = = = = =");
-  delay(2000);
-  setColorString(0, 0, 0);    
-  
+  delay(2000); 
 }
