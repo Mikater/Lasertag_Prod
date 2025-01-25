@@ -63,7 +63,7 @@ void setup() {
   WiFi_start(); // Web server
 
   pixels.begin();
-  pixels.setBrightness(10);
+  pixels.setBrightness(255);
   pixels.clear();
   circ_2(pixels.Color(255, 130, 0));
   // ico_bonus();

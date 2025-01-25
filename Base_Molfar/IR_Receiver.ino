@@ -3,7 +3,7 @@ void take_command(){
     int supdata = 0;
     int data = 0;
     int16_t index = 0;
-    recieved_pulse = pulseIn(IR_Input, LOW, 10000);
+    recieved_pulse = pulseIn(IR_Input, LOW, 50000);
     if (recieved_pulse > 1800){
       while (recieved_pulse != 0){
         recieved_pulse = pulseIn(IR_Input, LOW,lnk_timeout);
