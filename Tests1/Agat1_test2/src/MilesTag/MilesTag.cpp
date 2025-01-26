@@ -28,9 +28,9 @@ int invert_data(int data){
 int mt_take_comm(int ir_receive_pin){
     static int16_t recieved_pulse  = 0;
     int supdata = 0;
-    int data = 0;
+    int datar = 0;
     int16_t index = 0;
-    recieved_pulse = pulseIn(ir_receive_pin, LOW, 10000);
+    recieved_pulse = pulseIn(ir_receive_pin, LOW);
     if (recieved_pulse > 1800){
       while (recieved_pulse != 0){
         recieved_pulse = pulseIn(ir_receive_pin, LOW, lnk_timeout);
@@ -40,8 +40,11 @@ int mt_take_comm(int ir_receive_pin){
           break;
         }
         index++;}
-      data = invert_data(supdata);
-      return data;
+      Serial.println(supdata, BIN);
+      datar = invert_data(supdata);
+      Serial.println(datar, HEX);
+      Serial.println(" = = = = = = = = = = ");
+      return datar;
     }
     else {
         return 0;
