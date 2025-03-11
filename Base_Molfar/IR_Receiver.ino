@@ -37,7 +37,7 @@ void take_command(){
   } 
 }
 
-
+ 
 void print_data(int data){
   Serial.println("Data Received:");           // Serial
   Serial.println(data, BIN);
