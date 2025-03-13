@@ -1,7 +1,7 @@
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import ScreenManager, NoTransition
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
 
@@ -12,21 +12,23 @@ id_next_base = 0
 
 
 class BotLine(MDFloatLayout):
-
+    # нижня лінія меню
     def change_screen(self, sc):
         screen_manager.current = sc
 
 
 class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
+    # Прототип картки з бази
     def change_team(self, color):
         if self.circle.md_bg_color == color:
             self.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
         else:
             self.circle.md_bg_color = color
-            web_controll.find()
+            # web_controll.find()
 
 
 class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
+    # прототип картки гравця
     Live = True
 
     def kill_res_player(self):
@@ -41,13 +43,14 @@ class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
 
 class LTApp(MDApp):
     global screen_manager
-    screen_manager = ScreenManager()
+    screen_manager = ScreenManager(transition=NoTransition())
     def build(self):
 
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Teal"  # "Purple", "Red"
         screen_manager.add_widget(Builder.load_file("BaseScreen.kv"))
         screen_manager.add_widget(Builder.load_file("PlayersScreen.kv"))
+        screen_manager.add_widget(Builder.load_file("TargetsScreen.kv"))
         return screen_manager
 
     def on_start(self):

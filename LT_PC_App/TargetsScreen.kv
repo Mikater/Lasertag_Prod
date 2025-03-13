@@ -1,0 +1,52 @@
+MDScreen:
+    targets_bar: targets_bar
+    name: "Screen3"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+            size_hint: 1, None
+            height: '80dp'
+            orientation: 'vertical'
+            MDLabel:
+                text: "Targets"
+                font_size: "20sp"
+            MDBoxLayout:
+                orientation: 'horizontal'
+                MDAnchorLayout:
+                    anchor_x: 'center'
+                    MDIconButton:
+                        id: icon
+                        icon: "identifier"
+                MDAnchorLayout:
+                    anchor_x: 'center'
+                    MDIconButton:
+                        id: icon
+                        icon: "account-multiple"
+                MDAnchorLayout:
+                    anchor_x: 'center'
+                    MDIconButton:
+                        id: icon
+                        icon: "water"
+                MDAnchorLayout:
+                    anchor_x: 'center'
+                    MDIconButton:
+                        id: icon
+                        icon: "battery-charging"
+                MDAnchorLayout:
+                    anchor_x: 'center'
+                    MDIconButton:
+                        id: icon
+                        icon: "timer-outline"
+        MDScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            bar_width: 0
+            MDGridLayout:
+                id: targets_bar
+                padding: [10]
+                spacing: [10]
+                cols: 1
+                height: self.minimum_height
+                row_default_height: 200
+                size_hint_y: None
+        BotLine:
