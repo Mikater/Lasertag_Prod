@@ -4,17 +4,24 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, NoTransition
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
-
-import web_controll
+from kivymd.uix.boxlayout import MDBoxLayout
+import objects
 
 Window.size = (460, 600)
 id_next_base = 0
+
+manager = objects.DeviceManager()
 
 
 class BotLine(MDFloatLayout):
     # нижня лінія меню
     def change_screen(self, sc):
         screen_manager.current = sc
+
+
+class TargetLog(MDBoxLayout):
+    # Лог мішені
+    pass
 
 
 class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
@@ -25,6 +32,11 @@ class BaseCard(FakeRectangularElevationBehavior, MDFloatLayout):
         else:
             self.circle.md_bg_color = color
             # web_controll.find()
+
+
+class TargetCard(FakeRectangularElevationBehavior, MDFloatLayout):
+    # Прототип картки з бази
+    pass
 
 
 class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
@@ -40,10 +52,11 @@ class PlayerCard(FakeRectangularElevationBehavior, MDFloatLayout):
             self.Live = True
 
 
-
 class LTApp(MDApp):
     global screen_manager
     screen_manager = ScreenManager(transition=NoTransition())
+
+
     def build(self):
 
         self.theme_cls.theme_style = "Light"
@@ -54,10 +67,13 @@ class LTApp(MDApp):
         return screen_manager
 
     def on_start(self):
+        manager.find_devices()
+        self.update_targets()
         for i in range(1):
-            self.add1base()
+            self.add_base()
+            # self.add_target(1, "TAR00001")
 
-    def add1base(self):
+    def add_base(self):
         card = BaseCard()
         global id_next_base
         id = id_next_base
@@ -66,28 +82,24 @@ class LTApp(MDApp):
         card.circle.md_bg_color = (200/255, 200/255, 200/255, 1)
         screen_manager.get_screen("Screen1").obj_bar.add_widget(card)
 
+    def update_targets(self):
+        all_targets_serials = manager.get_all_targets()
+        for i in all_targets_serials:
+            device = manager.get_device(i)
+            self.add_target(str(device.ID), serial=device.serial_nom)
+
+    def add_target(self, id='00', serial="ERR00000"):
+        card = TargetCard()
+        card.id_text.text = f"ID {id}"
+        card.serial_nomber.text = f"sn: {serial}"
+        screen_manager.get_screen("Screen3").targets_bar.add_widget(card)
+
     def change_screen(self, sc):
         screen_manager.current = sc
-
-
-
 
 
 LTApp().run()
 
 
-class Base:
-    # Паттерн прототип бази команди
-    def __init__(self):
-        self.name = "База команди"
-        self.ID = 0
-        self.team = 1
-        self.mode = "Restarter"
-        self.isBroke = False
-        self.HP = 100
-        self.time_to_restart = 0
 
-    def broke(self):
-        self.isBroke = True
-        self.HP = 0
-        self.time_to_restart = 100
+
