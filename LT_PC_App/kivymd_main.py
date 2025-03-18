@@ -5,6 +5,7 @@ from kivy.uix.screenmanager import ScreenManager, NoTransition
 from kivymd.uix.behaviors import FakeRectangularElevationBehavior
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivy.clock import Clock
 import objects
 
 Window.size = (460, 600)
@@ -56,14 +57,18 @@ class LTApp(MDApp):
     global screen_manager
     screen_manager = ScreenManager(transition=NoTransition())
 
-
     def build(self):
-
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Teal"  # "Purple", "Red"
         screen_manager.add_widget(Builder.load_file("BaseScreen.kv"))
         screen_manager.add_widget(Builder.load_file("PlayersScreen.kv"))
         screen_manager.add_widget(Builder.load_file("TargetsScreen.kv"))
+
+        # Запускаємо оновлення логів кожні 5 секунд
+        # Clock.schedule_interval(self.update_targets_logs, 5)
+        # Запускаємо оновлення інформації про пристрої кожні 30 секунд
+        # Clock.schedule_interval(self.update_targets, 30)
+
         return screen_manager
 
     def on_start(self):
@@ -87,6 +92,11 @@ class LTApp(MDApp):
         for i in all_targets_serials:
             device = manager.get_device(i)
             self.add_target(str(device.ID), serial=device.serial_nom)
+
+    def update_targets_logs(self):
+        all_targets_serials = manager.get_all_targets()
+        for i in all_targets_serials:
+            manager.get_new_logs_from_target(i)
 
     def add_target(self, id='00', serial="ERR00000"):
         card = TargetCard()

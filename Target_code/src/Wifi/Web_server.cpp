@@ -69,26 +69,35 @@ void handleDeviceStaticInfo() {
 }
 
 void handleDeviceDynamicInfo() {
-  String json = "{";
+  String json = "{\"count\": 0, \"logs\": []}";  // За замовчуванням
 
-  for (size_t i = 0; i < 10; i++)
-  {
-    if(Last10Logs[0][3] == 0){
-      json += "No Logs";
-      break;
-    }
-    if (Last10Logs[i][3] == 0){
-      break;
-    } else {
-      json += "\"Log_ID\": " + String(i) + ",";
-      json += "\"ID\": " + String(Last10Logs[i][0]) + ",";
-      json += "\"Team\": " + String(Last10Logs[i][1]) + ",";
-      json += "\"Damage\": " + String(Last10Logs[i][2]) + ",";
-      json += "\"Time\": " + String(Last10Logs[i][3]) + ",";
+  int logCount = 0;
+  for (size_t i = 0; i < bufer; i++) {
+    if (Last10Logs[i][3] != 0) {
+      logCount++;
     }
   }
-  
-  json += "}";
+
+  if (logCount > 0) {
+    json = "{\"count\": " + String(logCount) + ", \"logs\": [";
+    bool firstLog = true;
+    for (size_t i = 0; i < bufer; i++) {
+      if (Last10Logs[i][3] != 0) {
+        if (!firstLog) {
+          json += ",";
+        }
+        json += "{";
+        json += "\"Log_ID\": " + String(i) + ",";
+        json += "\"ID\": " + String(Last10Logs[i][0]) + ",";
+        json += "\"Team\": " + String(Last10Logs[i][1]) + ",";
+        json += "\"Damage\": " + String(Last10Logs[i][2]) + ",";
+        json += "\"Time\": " + String(Last10Logs[i][3]);
+        json += "}";
+        firstLog = false;
+      }
+    }
+    json += "]}";
+  }
 
   server.send(200, "application/json", json);
   clearLogs();

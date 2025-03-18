@@ -1,18 +1,30 @@
 import requests
 from concurrent.futures import ThreadPoolExecutor  # Для паралельної перевірки
-import time
 import json
 
 ips_arr = []
 
 
-def get_dynamic_info(ip):
-    url = f"http://{ip}/info"
-    response = requests.get(url)
-    if response.status_code == 200:
-        print("Юху! Перемога буде!!!")
-    else:
-        print("Зрадонька якась(")
+def get_target_logs(ip, port=80, endpoint="/info"):
+    url = f"http://{ip}:{port}{endpoint}"  # Формуємо URL
+    try:
+        response = requests.get(url, timeout=5)  # Відправляємо GET-запит
+        if response.status_code == 200:  # Перевіряємо статус-код
+            try:
+                data = response.json()  # Парсимо JSON
+                if data["count"] > 0:
+                    print(f"Дані отримано з {url}: {data}")
+                    return data
+            except json.JSONDecodeError as e:
+                print(f"Помилка парсингу JSON з {url}: {e}")
+                print(f"Відповідь сервера: {response.text}")  # Виводимо відповідь для аналізу
+            except ValueError as e:
+                print(f"Помилка значення JSON з {url}: {e}")
+        else:
+            print(f"Помилка: сервер {url} повернув статус {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Помилка при запиті до {url}: {e}")
+    return None  # Повертаємо None у разі помилки
 
 
 def get_static_info(ip, port=80, endpoint="/"):
