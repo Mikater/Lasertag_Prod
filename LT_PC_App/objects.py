@@ -50,13 +50,15 @@ class DeviceManager:
     def get_device(self, device_serial_nom):
         return self.targets.get(device_serial_nom)
 
-    def get_new_logs_from_target(self, device_serial_nom):
+    def add_new_logs_to_target(self, device_serial_nom):
         device = self.get_device(device_serial_nom)
         ip = device.IP
-        data = web_controll.get_target_logs(ip)
-        for log in data:
-            self.add_log_to_device(device_serial_nom,
-                                   [log['ID'], log['Team'], log['Damage'], log['Time']])
+        supdata = web_controll.get_target_logs(ip)
+        if supdata:
+            data = supdata["logs"]
+            for log in data:
+                self.add_log_to_device(device_serial_nom,
+                                       [log['ID'], log['Team'], log['Damage'], log['Time']])
 
     def add_log_to_device(self, device_serial_nom, log):
         device = self.get_device(device_serial_nom)
@@ -64,7 +66,7 @@ class DeviceManager:
             device.add_log(log)
 
     def get_logs_for_device(self, device_serial_nom):
-        self.get_new_logs_from_target(device_serial_nom)
+        self.add_new_logs_to_target(device_serial_nom)
         device = self.get_device(device_serial_nom)
         if device:
             return device.get_logs()

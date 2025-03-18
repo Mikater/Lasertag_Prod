@@ -57,6 +57,10 @@ class LTApp(MDApp):
     global screen_manager
     screen_manager = ScreenManager(transition=NoTransition())
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.target_cards = {}
+
     def build(self):
         self.theme_cls.theme_style = "Light"
         self.theme_cls.primary_palette = "Teal"  # "Purple", "Red"
@@ -72,7 +76,6 @@ class LTApp(MDApp):
         return screen_manager
 
     def on_start(self):
-        manager.find_devices()
         self.update_targets()
         for i in range(1):
             self.add_base()
@@ -88,21 +91,42 @@ class LTApp(MDApp):
         screen_manager.get_screen("Screen1").obj_bar.add_widget(card)
 
     def update_targets(self):
+        manager.find_devices()
         all_targets_serials = manager.get_all_targets()
         for i in all_targets_serials:
-            device = manager.get_device(i)
-            self.add_target(str(device.ID), serial=device.serial_nom)
+            if i in self.target_cards:
+                pass
+            else:
+                device = manager.get_device(i)
+                self.add_target(str(device.ID), serial=device.serial_nom)
+        self.update_targets_logs()
 
     def update_targets_logs(self):
         all_targets_serials = manager.get_all_targets()
         for i in all_targets_serials:
-            manager.get_new_logs_from_target(i)
+            manager.add_new_logs_to_target(i)
+            card = self.target_cards[i]
+            logs_info = manager.get_device(i).get_logs_short_info()
+            card.hits_count.text = f'd{logs_info[2]} in {logs_info[0]}'
+            card.ids.Red_Hits.text = str(logs_info[1][0])
+            card.ids.Blue_Hits.text = str(logs_info[1][1])
+            card.ids.Yellow_Hits.text = str(logs_info[1][2])
+            card.ids.Green_Hits.text = str(logs_info[1][3])
 
     def add_target(self, id='00', serial="ERR00000"):
         card = TargetCard()
         card.id_text.text = f"ID {id}"
         card.serial_nomber.text = f"sn: {serial}"
+        manager.add_new_logs_to_target(serial)
+        logs_info = manager.get_device(serial).get_logs_short_info()
+        card.hits_count.text = f'd{logs_info[2]} in {logs_info[0]}'
+        card.ids.Red_Hits.text = str(logs_info[1][0])
+        card.ids.Blue_Hits.text = str(logs_info[1][1])
+        card.ids.Yellow_Hits.text = str(logs_info[1][2])
+        card.ids.Green_Hits.text = str(logs_info[1][3])
         screen_manager.get_screen("Screen3").targets_bar.add_widget(card)
+        self.target_cards[serial] = card
+
 
     def change_screen(self, sc):
         screen_manager.current = sc

@@ -71,7 +71,7 @@ def check_ip(ip, port=80, timeout=2):
 
 
 # Функція для сканування діапазону IP
-def scan_network(base_ip="192.168.1", start=1, end=55, port=80):
+def scan_network(base_ip="192.168.1", start=1, end=40, port=80):
     find_devices = []
     with ThreadPoolExecutor(max_workers=50) as executor:  # Використовуємо потоки для паралельної перевірки
         futures = [
