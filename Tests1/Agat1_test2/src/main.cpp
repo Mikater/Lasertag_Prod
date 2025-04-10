@@ -1,12 +1,17 @@
 #include <Arduino.h>
 #include "MilesTag/MilesTag.h"
+#include "Display/Display.h"
+#include "LED/LED.h"
 
 #define BUTTON_SHOOT 13
 #define BUTTON_RELOAD 16
+#define IR_LED_PIN 12
 #define IR_RECEIVE_PIN 14
 #define lnk_timeout 2000
 #define lvl_0 600
 #define lvl_1 1200
+
+int shoot_data = 0;
 
 
 void take_comm(int ir_receive_pin) {
@@ -42,12 +47,9 @@ void checkButtonShoot(void *pvParameters){
     if(!isTriggered && digitalRead(BUTTON_SHOOT) == LOW){
       isTriggered = true;
       Serial.println("Shoot");
+      mt_single_shoot(IR_LED_PIN, shoot_data);
     } else if(isTriggered && digitalRead(BUTTON_SHOOT) == HIGH){
       isTriggered = false;
-      Serial.println("No Shoot");
-      Serial.print("Executed on core: ");
-      Serial.println(xPortGetCoreID());
-      Serial.println("= = = = = = = = = =");
     }
 
     vTaskDelay(50 / portTICK_PERIOD_MS);
@@ -68,23 +70,38 @@ void checkButtonReload(void *pvParameters){
   }
 }
 
-void checkIrReceive(void *pvParameters) {
-  // while (true) {
-    
-  // }
+void displayReload(void *pvParameters) {
+  while (true) {
+    i2cDisp();
+
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+  }
+}
+
+void LED_reload(void *pvParameters) {
+  while (true) {
+    leds_tick();
+
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+  }
 }
 
 void setup() {
   Serial.begin(115200);
 
   pinMode(IR_RECEIVE_PIN, INPUT);
+  pinMode(IR_LED_PIN, OUTPUT);
   pinMode(BUTTON_SHOOT, INPUT_PULLUP);
   pinMode(BUTTON_RELOAD, INPUT_PULLUP);
+
+  shoot_data = mt_create_shoot(1, 1, 1);
+
+  displayStart();
 
   xTaskCreate(
     checkButtonShoot,
     "checkButtonShoot",
-    1000,
+    2048,
     NULL,
     2,
     NULL
@@ -98,16 +115,24 @@ void setup() {
     2,
     NULL
   );
+  
+  xTaskCreate(
+    displayReload,
+    "displayReload",
+    2048,
+    NULL,
+    3,
+    NULL
+  );
 
-  // xTaskCreatePinnedToCore(
-  //   checkIrReceive,   
-  //   "checkIrReceive", 
-  //   10000,            
-  //   NULL,             
-  //   1,                
-  //   NULL,             
-  //   1                 
-  // );
+  xTaskCreate(
+    LED_reload,
+    "LED_reload",
+    2048,
+    NULL,
+    3,
+    NULL
+  );
 }
 
 void loop() {
