@@ -12,11 +12,15 @@ uint32_t team_color[6] = {pixels.Color(255, 0, 0), pixels.Color(0, 0, 255), pixe
 
 bool pulsing = false;
 int shoot_period = 20;
-int pulse_period = 1000;
+int pulse_period = 20;
 unsigned long shoot_time_1;
 unsigned long shoot_time_2;
 unsigned long shoot_time_3;
 unsigned long shoot_time_4;
+unsigned long last_pulse_time;
+int pulse_prop = 1;
+int max_brightnes;
+int pulse_brightnes;
 int led_color = pixels.Color(255, 0, 255);
 
 int get_team_color(int team){
@@ -26,6 +30,7 @@ int get_team_color(int team){
 void leds_shot(int color){
     led_color = color;
     pulsing = false;
+    pixels.setBrightness(max_brightnes);
     
     unsigned long current_time = millis();
     
@@ -39,15 +44,40 @@ void leds_shot(int color){
 }
 
 void leds_pulse(int color){
+    pixels.setPixelColor(0, led_color);
+    pixels.setPixelColor(1, led_color);
+    pixels.setPixelColor(2, led_color);
+    pixels.setPixelColor(3, led_color);
+    pixels.show();
     led_color = color;
     pulsing = true;
+    pixels.setBrightness(max_brightnes);
+    pulse_brightnes = max_brightnes;
+    pulse_prop = 1;
 }
 
 void leds_tick(){
+    unsigned long current_time = millis();
+
     if(pulsing){
 
+        if(current_time >= last_pulse_time){
+            if(pulse_brightnes <= 0 || pulse_brightnes >= max_brightnes){
+                pulse_prop = pulse_prop * (-1);
+            }
+            pulse_brightnes = pulse_brightnes + pulse_prop * 5;
+            pixels.setBrightness(pulse_brightnes);
+            
+            pixels.setPixelColor(0, led_color);
+            pixels.setPixelColor(1, led_color);
+            pixels.setPixelColor(2, led_color);
+            pixels.setPixelColor(3, led_color);
+            
+            pixels.show();
+            // Serial.println(pulse_brightnes);
+            last_pulse_time = current_time + pulse_period;
+        }
     } else {
-        unsigned long current_time = millis();
         if(current_time>shoot_time_4){
             pixels.clear();
             pixels.show();
@@ -69,7 +99,8 @@ void leds_tick(){
 
 void leds_start(int strenght){
     pixels.begin();
-    pixels.setBrightness(strenght);
+    max_brightnes = strenght;
+    pixels.setBrightness(max_brightnes);
     pixels.clear();
     pixels.show();
 }
