@@ -14,6 +14,10 @@ class Target:
     def get_logs(self):
         return self.logs
 
+    def clear_logs(self):
+        print(f"logs.clear")
+        self.logs = []
+
     def get_logs_range(self):
         a = 0
         for i in self.logs:

@@ -109,6 +109,13 @@
                 font_size: "20sp"
                 halign: "center"
 
+        MDFillRoundFlatIconButton:
+            icon: "trash-can-outline"
+            text: "Очистити"
+            size_hint_x: None
+            width: "100dp"
+            on_release: app.clear_target_logs(root.serial_nomber.text.split(": ")[1])
+
 
 MDScreen:
     targets_bar: targets_bar

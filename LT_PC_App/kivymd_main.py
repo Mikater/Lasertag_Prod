@@ -142,6 +142,10 @@ class LTApp(MDApp):
         card.ids.hit_damage.text = str(log[2])
         screen_manager.get_screen("TargetLogs").logs_bar.add_widget(card)
 
+    def clear_target_logs(self, serial):
+        manager.get_device(serial).clear_logs()
+        self.update_targets_logs()
+
     def on_target_card_click(self, serial_number):
         print(f"Clicked card with serial: {serial_number}")  # Для тестування
         self.change_screen("TargetLogs", serial_target=serial_number)
