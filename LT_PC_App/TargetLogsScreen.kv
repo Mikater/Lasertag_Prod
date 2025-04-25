@@ -1,0 +1,95 @@
+<TargetLog>:
+    orientation: 'horizontal'
+    md_bg_color: 1, 1, 1, 1
+
+    MDAnchorLayout:
+        anchor_x: 'center'
+        MDLabel:
+            id: shooter_id
+            text: "ID 2"
+            size_hint_y: None
+            size_hint_x: None
+            height: "20dp"
+            width: "40dp"
+            font_size: "10sp"
+
+    MDAnchorLayout:
+        anchor_x: 'center'
+        MDLabel:
+            id: shooter_team
+            text: "YELL"
+            size_hint_y: None
+            size_hint_x: None
+            height: "20dp"
+            width: "33dp"
+            font_size: "10sp"
+
+    MDAnchorLayout:
+        anchor_x: 'center'
+        MDLabel:
+            id: hit_damage
+            text: "100"
+            size_hint_y: None
+            size_hint_x: None
+            height: "20dp"
+            width: "33dp"
+            font_size: "10sp"
+
+    MDAnchorLayout:
+        anchor_x: 'center'
+        MDLabel:
+            id: time
+            text: "22:06:12:856"
+            size_hint_y: None
+            size_hint_x: None
+            height: "20dp"
+            width: "80dp"
+            font_size: "10sp"
+
+
+MDScreen:
+    logs_bar: logs_bar
+    serial: serial
+    name: "TargetLogs"
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+            size_hint: 1, None
+            height: '60dp'
+            orientation: 'horizontal'
+            MDAnchorLayout:
+                anchor_x: 'left'
+                MDIconButton:
+                    id: icon
+                    icon: "arrow-left"
+                    on_release: app.change_screen("Screen3")
+            MDLabel:
+                id: serial
+                size_hint_x: None
+                width: "200dp"
+                padding: 20, 10
+                text: "Logs to Target"
+                font_size: "20sp"
+                halign: "left"
+            MDAnchorLayout:
+                anchor_x: 'right'
+                MDIconButton:
+                    id: icon
+                    icon: "eye-refresh"
+                    on_press: app.update_targets()
+
+        # Таблиця логів
+        MDScrollView:
+            logs_bar: logs_bar
+            do_scroll_x: False
+            do_scroll_y: True
+            bar_width: 0
+            MDGridLayout:
+                id: logs_bar
+                padding: [10]
+                spacing: [10]
+                cols: 1
+                height: self.minimum_height
+                row_default_height: 20
+                size_hint_y: None
+        BotLine:

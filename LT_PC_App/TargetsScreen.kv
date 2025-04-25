@@ -8,7 +8,8 @@
     elevation: 1
     md_bg_color: 1, 1, 1, 1
     radius: [8]
-    on_touch_down: app.change_screen("Screen1")
+    # on_touch_down: app.change_screen("Screen1")
+    on_touch_up: app.on_target_card_click(root.serial_nomber.text.split(": ")[1])
 
     # ID
     MDLabel:
@@ -108,53 +109,6 @@
                 font_size: "20sp"
                 halign: "center"
 
-<TargetLog>:
-    orientation: 'horizontal'
-    md_bg_color: 1, 1, 1, 1
-
-    MDAnchorLayout:
-        anchor_x: 'center'
-        MDLabel:
-            id: shooter_id
-            text: "ID 2"
-            size_hint_y: None
-            size_hint_x: None
-            height: "20dp"
-            width: "40dp"
-            font_size: "10sp"
-
-    MDAnchorLayout:
-        anchor_x: 'center'
-        MDLabel:
-            id: shooter_team
-            text: "YELL"
-            size_hint_y: None
-            size_hint_x: None
-            height: "20dp"
-            width: "33dp"
-            font_size: "10sp"
-
-    MDAnchorLayout:
-        anchor_x: 'center'
-        MDLabel:
-            id: hit_damage
-            text: "100"
-            size_hint_y: None
-            size_hint_x: None
-            height: "20dp"
-            width: "33dp"
-            font_size: "10sp"
-
-    MDAnchorLayout:
-        anchor_x: 'center'
-        MDLabel:
-            id: time
-            text: "22:06:12:856"
-            size_hint_y: None
-            size_hint_x: None
-            height: "20dp"
-            width: "80dp"
-            font_size: "10sp"
 
 MDScreen:
     targets_bar: targets_bar
@@ -174,8 +128,8 @@ MDScreen:
                 anchor_x: 'right'
                 MDIconButton:
                     id: icon
-                    icon: "identifier"
-                    on_press: app.update_targets()
+                    icon: "eye-refresh"
+                    on_release: app.update_targets()
 
         # Таблиця мішеней
         MDScrollView:

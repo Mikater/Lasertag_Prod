@@ -67,6 +67,7 @@ class LTApp(MDApp):
         screen_manager.add_widget(Builder.load_file("BaseScreen.kv"))
         screen_manager.add_widget(Builder.load_file("PlayersScreen.kv"))
         screen_manager.add_widget(Builder.load_file("TargetsScreen.kv"))
+        screen_manager.add_widget(Builder.load_file("TargetLogsScreen.kv"))
 
         # Запускаємо оновлення логів кожні 5 секунд
         # Clock.schedule_interval(self.update_targets_logs, 5)
@@ -127,9 +128,34 @@ class LTApp(MDApp):
         screen_manager.get_screen("Screen3").targets_bar.add_widget(card)
         self.target_cards[serial] = card
 
+    def refresh_target_log_bar(self, serial):
+        screen_manager.get_screen("TargetLogs").logs_bar.clear_widgets()
+        screen_manager.get_screen("TargetLogs").serial.text = serial
+        manager.add_new_logs_to_target(serial)
+        logs = manager.get_device(serial).get_logs()
+        if logs:
+            for i in logs:
+                self.add_log(i)
 
-    def change_screen(self, sc):
+    def add_log(self, log):
+        card = TargetLog()
+        card.ids.shooter_id.text = f"ID {log[0]}"
+        card.ids.shooter_team.text = f"Team {log[1]}"
+        card.ids.hit_damage.text = str(log[2])
+        card.ids.time = f"22:06:12:856"
+        screen_manager.get_screen("TargetLogs").logs_bar.add_widget(card)
+
+    def on_target_card_click(self, serial_number):
+        print(f"Clicked card with serial: {serial_number}")  # Для тестування
+        self.change_screen("TargetLogs", serial_target=serial_number)
+
+    def change_screen(self, sc, **kwargs):
+        serial_target = kwargs.get('serial_target', None)
+        if serial_target:
+            self.refresh_target_log_bar(serial_target)
+            print(serial_target)
         screen_manager.current = sc
+
 
 
 LTApp().run()

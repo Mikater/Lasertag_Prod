@@ -3,15 +3,17 @@
 #include <WebServer.h>
 
 // WiFi
-const char* ssid = "netis";
-const char* password = "Cntgfy40";
+const char* ssid = "DesireTag";
+const char* password = "DesTag2025";
 WebServer server(80);
 bool server_on = false;
-int ID = 1;
-const char* SerialNomber = "TAR00001";
+int ID = 0;
+const char* SerialNomber = "TAR00000";
 
 int SetFilter = -1;
 const int bufer = 100;
+
+int pause_value = 0;
 
 int Last10Logs[bufer][4];
 
@@ -56,6 +58,19 @@ void handleSetFilter() {
 
 int GetFilter(){
   return SetFilter;
+}
+
+void handlePause() {
+  if (server.hasArg("value")) {
+    pause_value = server.arg("value").toInt();
+    server.send(200, "text/plain", "Pause set to " + String(pause_value));
+  } else {
+    server.send(400, "text/plain", "Value not provided");
+  }
+}
+
+int GetPause(){
+  return pause_value;
 }
 
 void handleDeviceStaticInfo() {
@@ -105,6 +120,8 @@ void handleDeviceDynamicInfo() {
 
 void server_start(){
   server.on("/setFilter", handleSetFilter);
+
+  server.on("/pause", handlePause);
 
   server.on("/info", handleDeviceDynamicInfo);
 
