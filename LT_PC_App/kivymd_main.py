@@ -69,10 +69,8 @@ class LTApp(MDApp):
         screen_manager.add_widget(Builder.load_file("TargetsScreen.kv"))
         screen_manager.add_widget(Builder.load_file("TargetLogsScreen.kv"))
 
-        # Запускаємо оновлення логів кожні 5 секунд
-        # Clock.schedule_interval(self.update_targets_logs, 5)
-        # Запускаємо оновлення інформації про пристрої кожні 30 секунд
-        # Clock.schedule_interval(self.update_targets, 30)
+        Clock.schedule_interval(lambda dt: self.update_targets_logs(), 5)
+        Clock.schedule_interval(lambda dt: self.update_targets(), 30)
 
         return screen_manager
 
@@ -142,7 +140,6 @@ class LTApp(MDApp):
         card.ids.shooter_id.text = f"ID {log[0]}"
         card.ids.shooter_team.text = f"Team {log[1]}"
         card.ids.hit_damage.text = str(log[2])
-        card.ids.time = f"22:06:12:856"
         screen_manager.get_screen("TargetLogs").logs_bar.add_widget(card)
 
     def on_target_card_click(self, serial_number):
