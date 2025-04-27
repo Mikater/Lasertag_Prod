@@ -69,13 +69,13 @@ class LTApp(MDApp):
         screen_manager.add_widget(Builder.load_file("TargetsScreen.kv"))
         screen_manager.add_widget(Builder.load_file("TargetLogsScreen.kv"))
 
-        Clock.schedule_interval(lambda dt: self.update_targets_logs(), 5)
-        Clock.schedule_interval(lambda dt: self.update_targets(), 30)
+        # Clock.schedule_interval(lambda dt: self.update_targets_logs(), 5)
+        # Clock.schedule_interval(lambda dt: self.update_targets(), 100)
 
         return screen_manager
 
     def on_start(self):
-        self.update_targets()
+        # self.update_targets()
         for i in range(1):
             self.add_base()
             # self.add_target(1, "TAR00001")
@@ -149,6 +149,12 @@ class LTApp(MDApp):
     def on_target_card_click(self, serial_number):
         print(f"Clicked card with serial: {serial_number}")  # Для тестування
         self.change_screen("TargetLogs", serial_target=serial_number)
+
+    def pause_target(self, serial):
+        manager.get_device(serial).pause()
+
+    def unpause_target(self, serial):
+        manager.get_device(serial).unpause()
 
     def change_screen(self, sc, **kwargs):
         serial_target = kwargs.get('serial_target', None)

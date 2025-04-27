@@ -9,7 +9,6 @@
     md_bg_color: 1, 1, 1, 1
     radius: [8]
     # on_touch_down: app.change_screen("Screen1")
-    on_touch_up: app.on_target_card_click(root.serial_nomber.text.split(": ")[1])
 
     # ID
     MDLabel:
@@ -108,14 +107,22 @@
                 text: '0'
                 font_size: "20sp"
                 halign: "center"
-
-        MDFillRoundFlatIconButton:
+        # Кнопка очистки логів
+        MDIconButton:
             icon: "trash-can-outline"
-            text: "Очистити"
-            size_hint_x: None
-            width: "100dp"
             on_release: app.clear_target_logs(root.serial_nomber.text.split(": ")[1])
-
+        # Кнопка перегляду логів
+        MDIconButton:
+            icon: "clipboard-list-outline"
+            on_release: app.on_target_card_click(root.serial_nomber.text.split(": ")[1])
+        # Кнопка паузи
+        MDIconButton:
+            icon: "pause-octagon-outline"
+            on_release: app.pause_target(root.serial_nomber.text.split(": ")[1])
+        # Кнопка відновлення
+        MDIconButton:
+            icon: "play-circle-outline"
+            on_release: app.unpause_target(root.serial_nomber.text.split(": ")[1])
 
 MDScreen:
     targets_bar: targets_bar
@@ -134,7 +141,6 @@ MDScreen:
             MDAnchorLayout:
                 anchor_x: 'right'
                 MDIconButton:
-                    id: icon
                     icon: "eye-refresh"
                     on_release: app.update_targets()
 

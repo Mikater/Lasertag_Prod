@@ -14,6 +14,12 @@ class Target:
     def get_logs(self):
         return self.logs
 
+    def pause(self):
+        web_controll.pause_target(self.IP)
+
+    def unpause(self):
+        web_controll.unpause_target(self.IP)
+
     def clear_logs(self):
         print(f"logs.clear")
         self.logs = []

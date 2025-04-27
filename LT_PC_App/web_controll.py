@@ -4,6 +4,25 @@ import json
 
 ips_arr = []
 
+def pause_target(ip, port=80, endpoint="/pause"):
+    url = f"http://{ip}:{port}{endpoint}?value=1"  # Формуємо URL
+    try:
+        response = requests.get(url, timeout=5)  # Відправляємо GET-запит
+        if response.status_code != 200:  # Перевіряємо статус-код
+            print(f"Помилка: сервер {url} повернув статус {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Помилка при запиті до {url}: {e}")
+    return None  # Повертаємо None
+
+def unpause_target(ip, port=80, endpoint="/pause"):
+    url = f"http://{ip}:{port}{endpoint}?value=0"  # Формуємо URL
+    try:
+        response = requests.get(url, timeout=5)  # Відправляємо GET-запит
+        if response.status_code != 200:  # Перевіряємо статус-код
+            print(f"Помилка: сервер {url} повернув статус {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Помилка при запиті до {url}: {e}")
+    return None  # Повертаємо None
 
 def get_target_logs(ip, port=80, endpoint="/info"):
     url = f"http://{ip}:{port}{endpoint}"  # Формуємо URL
