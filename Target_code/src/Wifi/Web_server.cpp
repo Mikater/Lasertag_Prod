@@ -7,8 +7,8 @@ const char* ssid = "DesireTag";
 const char* password = "DesTag2025";
 WebServer server(80);
 bool server_on = false;
-int ID = 2;
-const char* SerialNomber = "TAR00002";
+int ID = 1;
+const char* SerialNomber = "TAR00001";
 
 int SetFilter = -1;
 const int bufer = 1000;
@@ -26,7 +26,7 @@ bool addShotToLogs(int id, int team, int damage){
       Last10Logs[i][0] = id;
       Last10Logs[i][1] = team;
       Last10Logs[i][2] = damage;
-      Last10Logs[i][3] = 1;
+      Last10Logs[i][3] = millis();
       return true;
     }
   }
