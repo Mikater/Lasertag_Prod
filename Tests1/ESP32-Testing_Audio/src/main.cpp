@@ -13,7 +13,7 @@ Audio audio;
 
 File shot_audio;
 
-int period = 100;
+int period = 350;
 unsigned long lastMillis = 0;
 bool isPlaying = false;  // Змінна для перевірки, чи грає звук
 
@@ -38,7 +38,7 @@ void setup() {
     LittleFS.begin();
   }
 
-  shot_audio = LittleFS.open("/blaster_shot.raw", "r");
+  shot_audio = LittleFS.open("/blaster_shot_2.raw", "r");
   if (!shot_audio) {
     Serial.println("Failed to open audio file.");
     return;
@@ -60,15 +60,17 @@ void loop() {
   //   isPlaying = false;  // Звук закінчився
   //   Serial.println("Sound finished playing.");
   // }
+
+  
   if (digitalRead(22) == LOW && !isPlaying) {  // Якщо кнопка натиснута
     if (current_time - lastMillis >= period) {
-      shot_audio.seek(0, SeekSet);  // <-- обов’язково
       player.stop();
       lastMillis = current_time;
-      // isPlaying = true;  // Встановлюємо, що звук грає
       Serial.println("Button pressed, playing sound.");
       player.playRawFile(shot_audio);
     }
   }
 }
+
+  
 

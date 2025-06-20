@@ -9,10 +9,10 @@ void I2SAudioPlayer::begin(uint32_t sampleRate, uint8_t bitsPerSample, uint8_t c
         .sample_rate = sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)(bitsPerSample),
         .channel_format = (channels == 2) ? I2S_CHANNEL_FMT_RIGHT_LEFT : I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = I2S_COMM_FORMAT_I2S_MSB,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
         .intr_alloc_flags = 0,
         .dma_buf_count = 8,
-        .dma_buf_len = 1024,
+        .dma_buf_len = 512,
         .use_apll = false
     };
 
@@ -33,18 +33,21 @@ void I2SAudioPlayer::playRawFile(File& file, size_t bufferSize) {
     uint8_t* buffer = (uint8_t*)malloc(bufferSize);
     if (!buffer) return;
 
+    file.seek(0, SeekSet);  // Переміщення в початок файлу
+
     _isPlaying = true;
+    size_t bytesWritten;
+
 
     while (file.available() && _isPlaying) {
         size_t bytesRead = file.read(buffer, bufferSize);
-        size_t bytesWritten;
         i2s_write(_port, buffer, bytesRead, &bytesWritten, portMAX_DELAY);
     }
-
-    free(buffer);
 }
 
 void I2SAudioPlayer::stop() {
     _isPlaying = false;
     i2s_zero_dma_buffer(_port);
+    i2s_stop(_port);
+    i2s_start(_port);
 }
